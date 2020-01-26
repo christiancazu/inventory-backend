@@ -1,0 +1,6 @@
+{
+  "[php]": {
+    "editor.tabSize": 4
+  },
+  "php-cs-fixer.onsave": true
+}

@@ -19,6 +19,9 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // res & req sanitizers
+        \App\Http\Middleware\SanitizeResReq\RequestToSnakeCase::class,
+        \App\Http\Middleware\SanitizeResReq\ResponseToCamelCase::class,
     ];
 
     /**
@@ -61,6 +64,11 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        // auth:jwt
+        'authJWT' => \App\Http\Middleware\AuthJWT::class,
+        // roles
+        'superAdmin' => \App\Http\Middleware\Roles\SuperAdmin::class,
+        'admin' => \App\Http\Middleware\Roles\Admin::class,
     ];
 
     /**

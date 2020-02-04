@@ -11,23 +11,12 @@
  * @return JsonResponse
  *
  */
-function SEND_SUCCESS(object $args)
+function SEND_RESPONSE($args)
 {
-    if (!isset($args->httpStatusCode)) {
-        $args->httpStatusCode = \HttpStatusCode::HTTP_OK;
+    if (! isset($args->translate)) {
+        return response()->json($args);
     }
-    return send($args);
-}
 
-function SEND_ERROR(object $args)
-{
-    if (!isset($args->httpStatusCode)) {
-        $args->httpStatusCode = \HttpStatusCode::HTTP_BAD_REQUEST;
-    }
-    return send($args);
-}
-
-function send(object $args) {
     return response()->json([
         'message' =>
             isset($args->attribute)
@@ -36,4 +25,4 @@ function send(object $args) {
                 ])
                 : trans($args->translate)
     ], $args->httpStatusCode);
-} 
+}

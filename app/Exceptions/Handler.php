@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use GuzzleHttp\Exception\ServerException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Database\QueryException;
 
 use HttpStatusCode;
 
@@ -62,65 +63,126 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        $message = trans('resource.server_error');
-        $httpStatusCode = HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR;
-        $errors = [];
-       
+        if ($e instanceof ValidationException) { // 422
+            return response()->json([
+                'message' => trans('validation.invalid'),
+                'errors' => $e->validator->getMessageBag()
+            ], HttpStatusCode::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $message = 'resource.server_error';
+        $httpStatusCode = 500;
+
         switch (true) {
             case $e instanceof TokenExpiredException:
-                $message = trans('auth.session.expired');
+                $message = 'auth.session.expired';
                 $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED; // 401
-                break;         
+                break;
+
             case $e instanceof TokenInvalidException:
-                $message = trans('auth.session.invalid');
+            case $e instanceof JWTException:
+                $message = 'auth.session.invalid';
                 $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED; // 401
                 break;
-            case $e instanceof JWTException:
-                $message = trans('auth.session.invalid');
-                $httpStatusCode = HttpStatusCode::HTTP_FORBIDDEN; // 403
-                break; 
-            case $e instanceof ModelNotFoundException:
-                $message = trans('resource.not_found');
-                $httpStatusCode = HttpStatusCode::HTTP_NOT_FOUND; // 404
+
+            case $e instanceof ModelNotFoundException: // 404
+                $message = 'resource.not_found_register';
+                $httpStatusCode = HttpStatusCode::HTTP_NOT_FOUND;
                 break;
-            case $e instanceof NotFoundHttpException:
-                $message = trans('resource.not_found');
-                $httpStatusCode = HttpStatusCode::HTTP_NOT_FOUND; // 404
+
+            case $e instanceof NotFoundHttpException: // 404
+                $message = 'resource.not_found';
+                $httpStatusCode = $e->getStatusCode();
                 break;
-            case $e instanceof MethodNotAllowedHttpException: // 405
-                $message = trans('resource.method_not_allowed');
-                $httpStatusCode = HttpStatusCode::HTTP_METHOD_NOT_ALLOWED;
+
+            case $e instanceof HttpException:
+                $httpStatusCode = $e->getStatusCode();
+                if ($httpStatusCode == HttpStatusCode::HTTP_FORBIDDEN) { // 404
+                    $message = empty($e->getMessage()) ? 'auth.session.not_permission' : $e->getMessage();
+                } else {
+                    $message = $e->getMessage();
+                }
                 break;
-            case $e instanceof ValidationException: // 422
-                $message = trans('validation.invalid');
-                $httpStatusCode = HttpStatusCode::HTTP_UNPROCESSABLE_ENTITY;
-                $errors = $e->validator->getMessageBag();
-                break;
-            case $e instanceof ServerException: // 500
-                $message = trans('resource.server_error');
-                $httpStatusCode = HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR;
-                break;
-            case $e instanceof HttpException: // 500
-                break;
-                
+
             default:
-            if (config('app.debug'))
-            {
+            if (config('app.debug')) {
                 return $this->renderExceptionWithWhoops($e);
             }
             return parent::render($request, $e);
-            //     $message = trans('resource.server_error');
-            //     $httpStatusCode = HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR;
-        }   
+        }
+
         return response()->json([
-            'message' => $message, 
-            'errors' => $errors
+            'message' => trans($message),
         ], $httpStatusCode);
+    
+
+
+        // dd($e instanceof QueryException);
+
+        
+        // $message = empty($e->getMessage()) ? 'resource.server_error' : $e->getMessage();
+        // $httpStatusCode = NULL;
+
+        // switch (true) {
+        //     case $e instanceof ValidationException: // 422
+        //         SEND_ERROR([
+        //             'message' => 'validation.invalid',
+        //             'errors' => $e->validator->getMessageBag()
+        //         ], HttpStatusCode::HTTP_UNPROCESSABLE_ENTITY);
+        //         break;
+
+        //     case $e instanceof TokenExpiredException:
+        //         $message = 'auth.session.expired';
+        //         $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED; // 401
+        //         break;
+
+        //     case $e instanceof TokenInvalidException:
+        //     case $e instanceof JWTException:
+        //         $message = 'auth.session.invalid';
+        //         $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED; // 401
+        //         break;
+
+        //     case $e instanceof ModelNotFoundException:
+        //         $message = 'resource.not_found';
+        //         $httpStatusCode = HttpStatusCode::HTTP_NOT_FOUND; // 404
+        //         break;
+
+        //     case $e instanceof NotFoundHttpException:
+        //         $message = 'resource.not_found';
+        //         $httpStatusCode = HttpStatusCode::HTTP_NOT_FOUND; // 404
+        //         break;
+
+        //     case $e instanceof MethodNotAllowedHttpException: // 405
+        //         $message = 'resource.method_not_allowed';
+        //         $httpStatusCode = HttpStatusCode::HTTP_METHOD_NOT_ALLOWED;
+        //         break;
+
+        //     case $e instanceof ServerException: // 500
+        //         $message = 'resource.server_error';
+        //         $httpStatusCode = HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR;
+        //         break;
+
+        //     case $e instanceof HttpException:
+        //         $httpStatusCode = $e->getStatusCode();
+        //         break;
+                
+        //     default:
+        //     if (config('app.debug'))
+        //     {
+        //         return $this->renderExceptionWithWhoops($e);
+        //     }
+        //     return parent::render($request, $e);
+        // }
+        // // abort([
+        // //     'message' => trans('validation.invalid'),
+        // //     'errors' => $e->validator->getMessageBag()
+        // // ], $httpStatusCode);
+        // SEND_RESPONSE(['message' => trans($message)], $httpStatusCode);
     }
 
     /**
      * Render an exception using Whoops.
-     * 
+     *
      * @param  \Exception $e
      * @return \Illuminate\Http\Response
      */

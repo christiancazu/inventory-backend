@@ -19,11 +19,13 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'names', 
-        'surnames', 
-        'email', 
-        'doc_num', 
-        'password'
+        'names',
+        'surnames',
+        'email',
+        'doc_num',
+        'password',
+        'role_id',
+        'activated'
     ];
 
     /**
@@ -32,9 +34,8 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 
-        'role_id', 
-        'modified_by_id', 
+        'password',
+        'role_id',
         'created_at',
         'updated_at'
     ];
@@ -65,8 +66,6 @@ class User extends Authenticatable implements JWTSubject
 
         // before creating
         self::creating(function ($model) {
-            // encrypting pw
-            $model->password = bcrypt($model->password);
             // assigning id of modifier user
             $model->modified_by_id = auth()->id();
         });
@@ -78,9 +77,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->role->id == Field::ID_ROLE_SUPERADMIN;
     }
 
-    public function isAdmin()
+    public function isStaff()
     {
-        return $this->role->id == Field::ID_ROLE_ADMIN;
+        return $this->role->id == Field::ID_ROLE_ADMIN || $this->role->id == Field::ID_ROLE_SUPERADMIN;
     }
 
     // relationships

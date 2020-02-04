@@ -68,7 +68,7 @@ class Kernel extends HttpKernel
         'authJWT' => \App\Http\Middleware\AuthJWT::class,
         // roles
         'superAdmin' => \App\Http\Middleware\Roles\SuperAdmin::class,
-        'admin' => \App\Http\Middleware\Roles\Admin::class,
+        'staff' => \App\Http\Middleware\Roles\Staff::class,
     ];
 
     /**

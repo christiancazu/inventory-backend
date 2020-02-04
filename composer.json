@@ -11,7 +11,7 @@
         "php": "^7.2",
         "bensampo/laravel-enum": "^1.29",
         "fideloper/proxy": "^4.2.2",
-        "laravel/framework": "^6.12",
+        "laravel/framework": "^6.13.1",
         "laravel/tinker": "^2.1",
         "tymon/jwt-auth": "1.0.0-rc.5"
     },

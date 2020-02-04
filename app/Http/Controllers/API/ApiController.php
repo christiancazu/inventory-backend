@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    public function __construct(array $exceptMiddlewareList = [])
+    public function __construct(array $exceptAuthJWTMiddlewareList = [])
     {
-        $this->middleware('authJWT', ['except' => $exceptMiddlewareList]); 
+        $this->middleware('authJWT', ['except' => $exceptAuthJWTMiddlewareList]); 
     }
 }

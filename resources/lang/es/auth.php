@@ -19,6 +19,6 @@ return [
         'invalid'           => 'La sesión no es válida',
         'expired'           => 'La sesión ha expirado',
         'out'               => 'Se ha cerrado la sesión',
-        'not_permission'    => 'No tiene los permisos para esta acción'
+        'not_permission'    => 'No tiene los permisos para esta solicitud'
     ]
 ];

@@ -19,9 +19,6 @@ class SuperAdmin
     {
         return auth()->user()->isSuperAdmin()
             ? $next($request)
-            : SEND_RESPONSE(new class {
-                public $translate = 'auth.session.not_permission';
-                public $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED;
-            });
+            : abort(HttpStatusCode::HTTP_FORBIDDEN, 'auth.session.not_permission');
     }
 }

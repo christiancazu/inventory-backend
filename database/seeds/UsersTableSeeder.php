@@ -28,8 +28,8 @@ class UsersTableSeeder extends Seeder
             "email" => "ciber@gmail.com",
             "doc_num" => "44084911",
             "password" => bcrypt(12345678),
-            "role_id" => Field::ID_ROLE_SUPERADMIN,
-            "modified_by_id" => Field::ID_ROLE_SUPERADMIN
+            "role_id" => Field::ID_ROLE_ADMIN,
+            "modified_by_id" => 1
         ]);
     }
 }

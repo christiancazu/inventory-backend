@@ -24,7 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->boolean('activated')->default(true);
             
-            $table->tinyInteger('role_id')->unsigned()->index()->default(Field::ID_ROLE_GUESS);
+            $table->tinyInteger('role_id')->unsigned()->index()->default(Field::ID_ROLE_USER);
             $table->foreign('role_id')->references('id')->on('roles');
 
             $table->smallInteger('modified_by_id')->unsigned()->index();

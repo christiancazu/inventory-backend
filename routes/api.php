@@ -13,47 +13,51 @@ use Illuminate\Http\Request;
 |
 */
 
+/*
+ █████╗ ██╗   ██╗████████╗██╗  ██╗
+██╔══██╗██║   ██║╚══██╔══╝██║  ██║
+███████║██║   ██║   ██║   ███████║
+██╔══██║██║   ██║   ██║   ██╔══██║
+██║  ██║╚██████╔╝   ██║   ██║  ██║
+╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+*/
 Route::group([
 
-    'namespace' => 'API',
+    'prefix' => 'auth'
 
 ], function () {
+    Route::post('signIn', 'AuthController@signIn');
+    Route::post('signUp', 'AuthController@signUp');
+    Route::get('signOut', 'AuthController@signOut');
+    Route::get('refresh', 'AuthController@refresh');
+    Route::get('user', 'AuthController@user');
+});
 
-    /*
-     █████╗ ██╗   ██╗████████╗██╗  ██╗
-    ██╔══██╗██║   ██║╚══██╔══╝██║  ██║
-    ███████║██║   ██║   ██║   ███████║
-    ██╔══██║██║   ██║   ██║   ██╔══██║
-    ██║  ██║╚██████╔╝   ██║   ██║  ██║
-    ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
-    */
-    Route::group([
+/*
+██████╗  ██████╗ ██╗     ███████╗███████╗
+██╔══██╗██╔═══██╗██║     ██╔════╝██╔════╝
+██████╔╝██║   ██║██║     █████╗  ███████╗
+██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║
+██║  ██║╚██████╔╝███████╗███████╗███████║
+╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
+*/
+Route::group([
 
-        'prefix' => 'auth'
-    
-    ], function () {
-    
-        Route::post('signIn', 'AuthController@signIn');
-        Route::post('signUp', 'AuthController@signUp');
-        Route::get('signOut', 'AuthController@signOut');
-        Route::get('refresh', 'AuthController@refresh');
-        Route::get('user', 'AuthController@user');
-    
-    });
+], function () {
+    Route::apiResource('roles', 'RoleController');
+});
 
-    /*
-    ██████╗  ██████╗ ██╗     ███████╗███████╗
-    ██╔══██╗██╔═══██╗██║     ██╔════╝██╔════╝
-    ██████╔╝██║   ██║██║     █████╗  ███████╗
-    ██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║
-    ██║  ██║╚██████╔╝███████╗███████╗███████║
-    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
-    */
-    Route::group([
+/*
+██╗   ██╗███████╗███████╗██████╗ ███████╗
+██║   ██║██╔════╝██╔════╝██╔══██╗██╔════╝
+██║   ██║███████╗█████╗  ██████╔╝███████╗
+██║   ██║╚════██║██╔══╝  ██╔══██╗╚════██║
+╚██████╔╝███████║███████╗██║  ██║███████║
+ ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝
+*/
+Route::group([
 
-    ], function () {
-    
-        Route::apiResource('roles', 'RoleController');
-    
-    });
+], function () {
+    Route::apiResource('users', 'UserController');
+    Route::put('users', 'UserController@updateSelf');
 });

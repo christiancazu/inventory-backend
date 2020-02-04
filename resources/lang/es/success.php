@@ -15,6 +15,7 @@ return [
 
     'created' => 'El :attribute ha sido registrado',
     'updated' => 'El :attribute ha sido actualizado',
+    'password_updated' => 'La contraseña se ha actualizado',
 
     'attributes'  => [
       'user'  => 'usuario',

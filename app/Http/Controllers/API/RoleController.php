@@ -18,7 +18,7 @@ class RoleController extends ApiController
     {
         parent::__construct();
 
-        $this->middleware('superAdmin');
+        $this->middleware('staff');
     }
     /**
      * Display a listing of the resource.

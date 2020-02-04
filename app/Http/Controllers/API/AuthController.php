@@ -22,10 +22,10 @@ class AuthController extends ApiController
      */
     public function __construct()
     {
-        $exceptMiddlewareList = ['signIn'];
-        parent::__construct($exceptMiddlewareList);
+        $exceptAuthJWTMiddlewareList = ['signIn'];
+        parent::__construct($exceptAuthJWTMiddlewareList);
 
-        $this->middleware('superAdmin', ['only' => ['signUp']]);
+        $this->middleware('staff', ['only' => ['signUp']]);
     }
 
     /**
@@ -35,16 +35,14 @@ class AuthController extends ApiController
      */
     public function signIn(SignInRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('doc_num', 'password');
 
-        if (! $token = auth()->attempt($credentials)) {
-            return SEND_ERROR(
-                new class {
-                    public $translate = 'validation.invalid_credentials';
-                    public $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED;
-                }
-            );
-        }
+        // if credentials are incorrects -> 422
+        ! ($token = auth()->attempt($credentials)) && abort(HttpStatusCode::HTTP_UNPROCESSABLE_ENTITY, 'validation.invalid_credentials');
+    
+        // if user->activated is false -> 403
+        ! (bool) auth()->user()->activated && abort(HttpStatusCode::HTTP_FORBIDDEN, 'resource.not_allowed.access');
+
         return $this->respondWithToken($token);
     }
 
@@ -55,7 +53,16 @@ class AuthController extends ApiController
      */
     public function signUp(SignUpRequest $request)
     {
-        return User::create($request->all());
+        // only accept a role_id major that selfone
+        // ex: id of admin is 2 then can create users with role 3 or more
+        ! ($request->role_id > auth()->user()->role_id) && abort(HttpStatusCode::HTTP_FORBIDDEN, 'resource.not_allowed.assign_role'); 
+
+        // setting password equals to doc_num when a user is created for first time
+        return User::create(
+            $request->merge([
+                'password' => bcrypt($request->doc_num)
+            ])->all()
+        );
     }
 
     /**
@@ -65,7 +72,7 @@ class AuthController extends ApiController
      */
     public function user()
     {
-        return response()->json($this->userResource());
+        return SEND_RESPONSE($this->userResource());
     }
 
     /**
@@ -77,7 +84,7 @@ class AuthController extends ApiController
     {
         auth()->logout();
 
-        return SEND_SUCCESS(new class {
+        return SEND_RESPONSE(new class {
             public $translate = 'auth.session.out';
         });
     }
@@ -101,7 +108,7 @@ class AuthController extends ApiController
      */
     protected function respondWithToken(string $token)
     {
-        return response()->json([
+        return SEND_RESPONSE([
             'user' => $this->userResource(),
             'token' => $token,
             'expires' => auth()->factory()->getTTL() * 60
@@ -110,8 +117,6 @@ class AuthController extends ApiController
 
     protected function userResource()
     {
-        // dd(\App\Role::find(3));
-        // \App\Role::find(1)->restore();
         return new UserResource(auth()->user());
     }
 }

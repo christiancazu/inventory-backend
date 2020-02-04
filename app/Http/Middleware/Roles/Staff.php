@@ -6,7 +6,7 @@ use Closure;
 
 use HttpStatusCode;
 
-class Admin
+class Staff
 {
     /**
      * Handle an incoming request.
@@ -17,11 +17,8 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        return auth()->user()->isAdmin()
+        return auth()->user()->isStaff()
             ? $next($request)
-            : SEND_RESPONSE(new class {
-                public $translate = 'auth.session.not_permission';
-                public $httpStatusCode = HttpStatusCode::HTTP_UNAUTHORIZED;
-            });
+            : abort(HttpStatusCode::HTTP_FORBIDDEN, 'auth.session.not_permission');
     }
 }

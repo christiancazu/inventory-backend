@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             'doc_num' => $this->doc_num,
             'email' => $this->email,
             'activated' => !!$this->activated,
-            'role' => $this->role->name
-        ];            
+            'role' => $this->role->only('id', 'name')
+        ];
     }
 }
